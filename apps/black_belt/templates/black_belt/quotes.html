@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'black_belt/css/styles.css'%}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <title>Quotes</title>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="left">
+                <h1>Welcome, {{user.alias}}</h1>
+                <h2>Quotable Quotes</h2>
+                <div id="quotes">
+                {% for quote in quotes %}
+                    <h3>{{quote.quoted_by}}:</h3>
+                    <h4>{{quote.content}}</h4>
+                    <h4>Posted by: <a href="/viewUser/{{quote.user.id}}">{{quote.user.name}}</a></h4>
+                    <form action="/favorite" method="post" id="favoriteForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="quoteObj" value="{{quote.id}}">
+                        <input type="hidden" name="userObj" value="{{quote.user.id}}">
+                        <input type="submit" value="Add to my list">
+                    </form>
+                {% endfor %}
+                </div>
+            </div>
+            <div id="right">
+                <a class="floatRight" href="/">Logout</a><br>
+                <h2 id="favorites">Your Favorites</h2>
+                <div id="otherQuotes">
+                    {% for favorite in favorites %}
+                        <p>{{favorite.quote.quoted_by}}: {{favorite.quote.content}}</p>
+                        <p>Posted by: <a href="/viewUser/{{quote.user.id}}">{{favorite.user.alias}}</p></a>
+                        <form action="/removeFavorite" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="quote" value="{{favorite.id}}">
+                            <input type="submit" value="Remove From My List">
+                        </form>
+                    {% endfor %}
+                </div>
+                <div id="addQuote">
+                    <form action="/process" method="post" class="form">
+                        {% csrf_token %}
+                        <h3>Contribute a quote:</h3>
+                        Quoted By:<input class="form-control" type="text" name="quotedBy"><br>
+                        Message: <textarea class="form-control" name="content" rows="5" cols="20"></textarea><br>
+                        <input class="form-control" type="submit" value="Submit Review">
+                    </form>
+                    {% for message in messages %}
+                        <h2>{{message}}</h2>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
